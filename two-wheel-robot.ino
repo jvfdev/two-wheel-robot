@@ -44,6 +44,8 @@ void loop(){
   Serial.print(AcXg);
   Serial.print(", Y: ");
   Serial.println(AcYg);
+  float angle = atan2(AcYg, AcZg)*RAD_TO_DEG;
+  Serial.println(angle);
   delay(250);
 }
 
