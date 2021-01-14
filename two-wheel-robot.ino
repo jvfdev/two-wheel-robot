@@ -27,9 +27,11 @@ float gyroAngle = 0;
 float xCal = 16596.0;
 float yCal = 16845.0;
 float zCal = 17742.0;
-float AcXg;
-float AcYg;
-float AcZg;
+float AcXg, AcYg, AcZg;
+float currentAngle, previousAngle=0;
+
+const float alpha = .0066;
+
 
 unsigned long currTime, prevTime = 0, loopTime;
 
@@ -55,8 +57,10 @@ void loop() {
   float angle = atan2(AcYg, AcZg) * RAD_TO_DEG;
   Serial.print("acc ang: ");
   Serial.print(angle);
-  Serial.print(", gyr0 ang: ");
-  Serial.print(gyroAngle);
+  Serial.print(", gyro ang: ");
+  Serial.println(gyroAngle);
+  currentAngle = alpha*(previousAngle + gyroAngle) + (1.0-alpha)*(angle);
+  Serial.println(currentAngle);
   delay(250);
 }
 
