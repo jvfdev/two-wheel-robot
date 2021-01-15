@@ -36,6 +36,20 @@ const float alpha = .0066;
 
 unsigned long currTime, prevTime = 0, loopTime;
 
+
+void init_PID(){
+  // Sets up timer to run control loop at 200 Hz
+  noInterrupts(); // disable interrupts before setting registers
+  TCCR1A = 0;
+  TCCR1B = 0;
+  OCR1A = 9999;
+  TCCR1B |= (1 << WGM12);
+  TCCR1B |= (1 << CS11);
+  TIMSK1 |= (1 << OCIE1A);
+  
+  interrupts();
+}
+
 void setup() {
   Wire.begin();
   Wire.beginTransmission(MPU_addr);
