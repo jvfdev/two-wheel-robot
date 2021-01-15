@@ -27,6 +27,7 @@ float gyroAngle = 0;
 float xCal = 16596.0;
 float yCal = 16845.0;
 float zCal = 17742.0;
+int GyXCal = 854;
 float AcXg, AcYg, AcZg;
 float currentAngle, previousAngle=0;
 
@@ -48,17 +49,18 @@ void loop() {
   currTime = millis();
   loopTime = currTime - prevTime;
   prevTime = currTime;
+//  Serial.println(GyX+854);
   gyroRate = map(GyX, -32768, 32767, -250, 250);
   gyroAngle = gyroAngle + (float)gyroRate*loopTime/1000.0;
-  Serial.print("X: ");
-  Serial.print(AcXg);
-  Serial.print(", Y: ");
-  Serial.println(AcYg);
+//  Serial.print("X: ");
+//  Serial.print(AcXg);
+//  Serial.print(", Y: ");
+//  Serial.println(AcYg);
   float angle = atan2(AcYg, AcZg) * RAD_TO_DEG;
-  Serial.print("acc ang: ");
-  Serial.print(angle);
-  Serial.print(", gyro ang: ");
-  Serial.println(gyroAngle);
+//  Serial.print("acc ang: ");
+//  Serial.print(angle);
+//  Serial.print(", gyro ang: ");
+//  Serial.println(gyroAngle);
   currentAngle = alpha*(previousAngle + gyroAngle) + (1.0-alpha)*(angle);
   Serial.println(currentAngle);
   delay(250);
@@ -80,6 +82,8 @@ void updateSensorValues() {
   AcXg = AcX / xCal;
   AcYg = AcY / yCal;
   AcZg = AcZ / zCal;
+  GyX = GyX + GyXCal;
+  
   /*
     Serial.print("AcX = "); Serial.print(AcX);
     Serial.print(" | AcY = "); Serial.print(AcY);
