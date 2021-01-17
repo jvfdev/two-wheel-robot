@@ -22,20 +22,24 @@
 
 const byte ledPin = 13;
 
+const float kp = 40;
+const float kd = 0.05;
+const float ki = 40;
+
 // MPU6050 Setup
 const int MPU_addr = 0x68; // I2C address of the MPU-6050
 int16_t AcX, AcY, AcZ, Tmp, GyX, GyY, GyZ, gyroRate;
-float gyroAngle = 0;
+
 // calibration values
 float xCal = 16596.0;
 float yCal = 16845.0;
 float zCal = 17742.0;
 int GyXCal = 854;
-float AcXg, AcYg, AcZg;
+volatile float AcXg, AcYg, AcZg, gyroAngle = 0;
 float currentAngle, previousAngle = 0;
 
 const float alpha = .0066;
-byte count = 0;
+volatile byte count = 0;
 
 
 unsigned long currTime, prevTime = 0, loopTime;
@@ -119,7 +123,7 @@ void updateSensorValues() {
 ISR(TIMER1_COMPA_vect){
   //This interrupt activated every time timer comparitor triggers
   
-  //turns the LED on/off at 1 Hz to indicate functioning
+  //turns the LED on/off at 1 Hz to indicate functioning/
   count++;
   if(count == 100){
     count = 0;
