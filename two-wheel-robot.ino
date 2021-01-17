@@ -22,23 +22,28 @@
 
 const byte ledPin = 13;
 
-const float kp = 40;
-const float kd = 0.05;
-const float ki = 40;
+const float Kp = 40;
+const float Kd = 0;
+const float Ki = 0;
+const float alpha = 0.0066;
+const float sampleTime = 0.005;
+const float targetAngle = 0;
 
 // MPU6050 Setup
 const int MPU_addr = 0x68; // I2C address of the MPU-6050
-int16_t AcX, AcY, AcZ, Tmp, GyX, GyY, GyZ, gyroRate;
+int16_t AcX, AcY, AcZ, Tmp, GyY, GyZ;
 
 // calibration values
-float xCal = 16596.0;
-float yCal = 16845.0;
-float zCal = 17742.0;
-int GyXCal = 854;
-volatile float AcXg, AcYg, AcZg, gyroAngle = 0;
-float currentAngle, previousAngle = 0;
+const float xCal = 16596.0;
+const float yCal = 16845.0;
+const float zCal = 17742.0;
+const int GyXCal = 854;
 
-const float alpha = .0066;
+volatile int16_t gyroRate, GyX;
+volatile float AcXg, AcYg, AcZg, accAngle = 0, gyroAngle = 0;
+volatile float currentAngle, prevAngle = 0, error, prevError = 0, errorSum = 0, motorPower = 0;
+
+
 volatile byte count = 0;
 
 
@@ -85,10 +90,11 @@ void loop() {
   //  Serial.print(angle);
   //  Serial.print(", gyro ang: ");
   //  Serial.println(gyroAngle);
-  currentAngle = alpha * (previousAngle + gyroAngle) + (1.0 - alpha) * (angle);
-  Serial.println(currentAngle);
+  //  currentAngle = (1.0 - alpha) * (prevAngle + gyroAngle) + alpha * (angle);
+//  Serial.println(currentAngle);
   delay(250);
-//  digitalWrite(ledPin, !digitalRead(ledPin));
+  //  digitalWrite(ledPin, !digitalRead(ledPin));
+  Serial.println(motorPower);
 }
 
 void updateSensorValues() {
@@ -120,13 +126,23 @@ void updateSensorValues() {
   */
 }
 
-ISR(TIMER1_COMPA_vect){
+ISR(TIMER1_COMPA_vect) {
   //This interrupt activated every time timer comparitor triggers
-  
+  accAngle = atan2(AcYg, AcZg) * RAD_TO_DEG;
+  gyroRate = map(GyX, -32768, 32767, -250, 250);
+  gyroAngle = (float)gyroRate * sampleTime;
+  currentAngle = (1.0 - alpha) * (prevAngle + gyroAngle) + alpha * (accAngle);
+
+  error = currentAngle-targetAngle;
+  errorSum = errorSum + error;
+  errorSum = constrain(errorSum, -300, 300);
+  motorPower = Kp * error + Ki*errorSum*sampleTime - Kd*(currentAngle-prevAngle)/sampleTime;
+
+  prevAngle = currentAngle;
   //turns the LED on/off at 1 Hz to indicate functioning/
   count++;
-  if(count == 100){
+  if (count == 100) {
     count = 0;
     digitalWrite(ledPin, !digitalRead(ledPin));
   }
-  }
+}
