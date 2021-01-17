@@ -19,6 +19,9 @@
 #include<Wire.h>
 #include<math.h>
 
+
+const byte ledPin = 13;
+
 // MPU6050 Setup
 const int MPU_addr = 0x68; // I2C address of the MPU-6050
 int16_t AcX, AcY, AcZ, Tmp, GyX, GyY, GyZ, gyroRate;
@@ -29,24 +32,24 @@ float yCal = 16845.0;
 float zCal = 17742.0;
 int GyXCal = 854;
 float AcXg, AcYg, AcZg;
-float currentAngle, previousAngle=0;
+float currentAngle, previousAngle = 0;
 
 const float alpha = .0066;
+byte count = 0;
 
 
 unsigned long currTime, prevTime = 0, loopTime;
 
 
-void init_PID(){
+void init_PID() {
   // Sets up timer to run control loop at 200 Hz
   noInterrupts(); // disable interrupts before setting registers
-  TCCR1A = 0;
-  TCCR1B = 0;
-  OCR1A = 9999;
-  TCCR1B |= (1 << WGM12);
-  TCCR1B |= (1 << CS11);
-  TIMSK1 |= (1 << OCIE1A);
-  
+  TCCR1A = 0; //sets register to zero, not yet sure why this is here.
+  TCCR1B = 0; // same as above
+  OCR1A = 9999; // sets compare match register
+  TCCR1B |= (1 << WGM12); // turns on CTC
+  TCCR1B |= (1 << CS11); // sets prescaler to 8
+  TIMSK1 |= (1 << OCIE1A); // enable the interrupt
   interrupts();
 }
 
@@ -57,27 +60,31 @@ void setup() {
   Wire.write(0);     // set to zero (wakes up the MPU-6050)
   Wire.endTransmission(true);
   Serial.begin(9600);
+  init_PID();
+  pinMode(ledPin, OUTPUT);
+  digitalWrite(ledPin, HIGH);
 }
 void loop() {
   updateSensorValues();
   currTime = millis();
   loopTime = currTime - prevTime;
   prevTime = currTime;
-//  Serial.println(GyX+854);
+  //  Serial.println(GyX+854);
   gyroRate = map(GyX, -32768, 32767, -250, 250);
-  gyroAngle = gyroAngle + (float)gyroRate*loopTime/1000.0;
-//  Serial.print("X: ");
-//  Serial.print(AcXg);
-//  Serial.print(", Y: ");
-//  Serial.println(AcYg);
+  gyroAngle = gyroAngle + (float)gyroRate * loopTime / 1000.0;
+  //  Serial.print("X: ");
+  //  Serial.print(AcXg);
+  //  Serial.print(", Y: ");
+  //  Serial.println(AcYg);
   float angle = atan2(AcYg, AcZg) * RAD_TO_DEG;
-//  Serial.print("acc ang: ");
-//  Serial.print(angle);
-//  Serial.print(", gyro ang: ");
-//  Serial.println(gyroAngle);
-  currentAngle = alpha*(previousAngle + gyroAngle) + (1.0-alpha)*(angle);
+  //  Serial.print("acc ang: ");
+  //  Serial.print(angle);
+  //  Serial.print(", gyro ang: ");
+  //  Serial.println(gyroAngle);
+  currentAngle = alpha * (previousAngle + gyroAngle) + (1.0 - alpha) * (angle);
   Serial.println(currentAngle);
   delay(250);
+//  digitalWrite(ledPin, !digitalRead(ledPin));
 }
 
 void updateSensorValues() {
@@ -97,7 +104,7 @@ void updateSensorValues() {
   AcYg = AcY / yCal;
   AcZg = AcZ / zCal;
   GyX = GyX + GyXCal;
-  
+
   /*
     Serial.print("AcX = "); Serial.print(AcX);
     Serial.print(" | AcY = "); Serial.print(AcY);
@@ -108,3 +115,14 @@ void updateSensorValues() {
     Serial.print(" | GyZ = "); Serial.println(GyZ);
   */
 }
+
+ISR(TIMER1_COMPA_vect){
+  //This interrupt activated every time timer comparitor triggers
+  
+  //turns the LED on/off at 1 Hz to indicate functioning
+  count++;
+  if(count == 100){
+    count = 0;
+    digitalWrite(ledPin, !digitalRead(ledPin));
+  }
+  }
