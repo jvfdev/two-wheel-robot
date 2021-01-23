@@ -26,8 +26,8 @@ const float Kp = 40;
 const float Kd = 0;
 const float Ki = 0;
 const float alpha = 0.0066;
-const float sampleTime = 0.005;
-const float targetAngle = 0;
+const float sampleTime = 0.005; // seconds
+const float targetAngle = 0; //degrees
 
 // MPU6050 Setup
 const int MPU_addr = 0x68; // I2C address of the MPU-6050
@@ -75,25 +75,17 @@ void setup() {
 }
 void loop() {
   updateSensorValues();
-  currTime = millis();
-  loopTime = currTime - prevTime;
-  prevTime = currTime;
-  //  Serial.println(GyX+854);
-  gyroRate = map(GyX, -32768, 32767, -250, 250);
-  gyroAngle = gyroAngle + (float)gyroRate * loopTime / 1000.0;
-  //  Serial.print("X: ");
-  //  Serial.print(AcXg);
-  //  Serial.print(", Y: ");
-  //  Serial.println(AcYg);
-  float angle = atan2(AcYg, AcZg) * RAD_TO_DEG;
-  //  Serial.print("acc ang: ");
-  //  Serial.print(angle);
-  //  Serial.print(", gyro ang: ");
-  //  Serial.println(gyroAngle);
-  //  currentAngle = (1.0 - alpha) * (prevAngle + gyroAngle) + alpha * (angle);
-//  Serial.println(currentAngle);
+//  currTime = millis();
+//  loopTime = currTime - prevTime;
+//  prevTime = currTime;
+
+//  gyroRate = map(GyX, -32768, 32767, -250, 250);
+//  gyroAngle = gyroAngle + (float)gyroRate * loopTime / 1000.0;
+
+//  float angle = atan2(AcYg, AcZg) * RAD_TO_DEG;
+
   delay(250);
-  //  digitalWrite(ledPin, !digitalRead(ledPin));
+
   Serial.println(motorPower);
 }
 
