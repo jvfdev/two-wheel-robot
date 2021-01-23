@@ -21,6 +21,9 @@
 
 
 const byte ledPin = 13;
+const byte motor0PWMPin = 6;
+const byte motor0In1Pin = 7;
+const byte motor0In2Pin = 8;
 
 const float Kp = 40;
 const float Kd = 0;
@@ -71,22 +74,39 @@ void setup() {
   Serial.begin(9600);
   init_PID();
   pinMode(ledPin, OUTPUT);
+  pinMode(motor0PWMPin, OUTPUT);
+  pinMode(motor0In1Pin, OUTPUT);
+  pinMode(motor0In2Pin, OUTPUT);
+  
   digitalWrite(ledPin, HIGH);
+  digitalWrite(motor0In1Pin, HIGH);
+  digitalWrite(motor0In2Pin, LOW);
+  analogWrite(motor0PWMPin, 0);
+
+
+
+
+
+  
 }
 void loop() {
   updateSensorValues();
-//  currTime = millis();
-//  loopTime = currTime - prevTime;
-//  prevTime = currTime;
-
-//  gyroRate = map(GyX, -32768, 32767, -250, 250);
-//  gyroAngle = gyroAngle + (float)gyroRate * loopTime / 1000.0;
-
-//  float angle = atan2(AcYg, AcZg) * RAD_TO_DEG;
-
-  delay(250);
+//  delay(250);
 
   Serial.println(motorPower);
+  setSpeed(motorPower);
+}
+
+void setSpeed(int inputPower){
+  if(inputPower > 0){
+    digitalWrite(motor0In1Pin, HIGH);
+    digitalWrite(motor0In2Pin, LOW);
+  }
+  else{
+    digitalWrite(motor0In1Pin, LOW);
+    digitalWrite(motor0In2Pin, HIGH);
+  }
+  analogWrite(motor0PWMPin, abs(motorPower));
 }
 
 void updateSensorValues() {
@@ -129,6 +149,7 @@ ISR(TIMER1_COMPA_vect) {
   errorSum = errorSum + error;
   errorSum = constrain(errorSum, -300, 300);
   motorPower = Kp * error + Ki*errorSum*sampleTime - Kd*(currentAngle-prevAngle)/sampleTime;
+  motorPower = constrain(motorPower, -255, 255);
 
   prevAngle = currentAngle;
   //turns the LED on/off at 1 Hz to indicate functioning/
