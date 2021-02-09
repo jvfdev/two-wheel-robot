@@ -34,7 +34,7 @@ const float Kd = 0;
 const float Ki = 0;
 const float alpha = 0.0066;
 const float sampleTime = 0.005; // seconds
-const float targetAngle = 0; //degrees
+const float targetAngle = -3; //degrees
 
 // MPU6050 Setup
 const int MPU_addr = 0x68; // I2C address of the MPU-6050
@@ -85,8 +85,10 @@ void setup() {
   pinMode(motor1In1Pin, OUTPUT);
   pinMode(motor1In2Pin, OUTPUT);
 
-  digitalWrite(motor0In1Pin, HIGH);
+  digitalWrite(motor0In1Pin, LOW);
   digitalWrite(motor0In2Pin, LOW);
+  digitalWrite(motor1In1Pin, LOW);
+  digitalWrite(motor1In2Pin, LOW);
   analogWrite(motor0PWMPin, 0);
   analogWrite(motor1PWMPin, 0);
 
@@ -106,7 +108,7 @@ void loop() {
   updateSensorValues();
   //  delay(250);
 
-  Serial.println(motorPower);
+//  Serial.println(motorPower);
   setSpeed(motorPower);
 }
 
@@ -114,14 +116,14 @@ void setSpeed(int inputPower) {
   if (inputPower > 0) {
     digitalWrite(motor0In1Pin, HIGH);
     digitalWrite(motor0In2Pin, LOW);
-    digitalWrite(motor1In1Pin, LOW);
-    digitalWrite(motor1In2Pin, HIGH);
+    digitalWrite(motor1In1Pin, HIGH);
+    digitalWrite(motor1In2Pin, LOW);
   }
   else {
     digitalWrite(motor0In1Pin, LOW);
     digitalWrite(motor0In2Pin, HIGH);
-    digitalWrite(motor1In1Pin, HIGH);
-    digitalWrite(motor1In2Pin, LOW);
+    digitalWrite(motor1In1Pin, LOW);
+    digitalWrite(motor1In2Pin, HIGH);
   }
   analogWrite(motor0PWMPin, abs(motorPower));
   analogWrite(motor1PWMPin, abs(motorPower));
