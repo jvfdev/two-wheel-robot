@@ -21,9 +21,13 @@
 
 
 const byte ledPin = 13;
-const byte motor0PWMPin = 6;
-const byte motor0In1Pin = 7;
-const byte motor0In2Pin = 8;
+const byte motor0PWMPin = 3;
+const byte motor0In1Pin = 4;
+const byte motor0In2Pin = 5;
+
+const byte motor1PWMPin = 6;
+const byte motor1In1Pin = 7;
+const byte motor1In2Pin = 9;
 
 const float Kp = 40;
 const float Kd = 0;
