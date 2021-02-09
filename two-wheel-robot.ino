@@ -81,6 +81,9 @@ void setup() {
   pinMode(motor0PWMPin, OUTPUT);
   pinMode(motor0In1Pin, OUTPUT);
   pinMode(motor0In2Pin, OUTPUT);
+  pinMode(motor1PWMPin, OUTPUT);
+  pinMode(motor1In1Pin, OUTPUT);
+  pinMode(motor1In2Pin, OUTPUT);
 
   digitalWrite(motor0In1Pin, HIGH);
   digitalWrite(motor0In2Pin, LOW);
@@ -111,8 +114,8 @@ void setSpeed(int inputPower) {
   if (inputPower > 0) {
     digitalWrite(motor0In1Pin, HIGH);
     digitalWrite(motor0In2Pin, LOW);
-    digitalWrite(motor1In1Pin, HIGH);
-    digitalWrite(motor1In2Pin, LOW);
+    digitalWrite(motor1In1Pin, LOW);
+    digitalWrite(motor1In2Pin, HIGH);
   }
   else {
     digitalWrite(motor0In1Pin, LOW);
