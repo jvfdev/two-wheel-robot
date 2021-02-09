@@ -76,37 +76,43 @@ void setup() {
   Wire.write(0);     // set to zero (wakes up the MPU-6050)
   Wire.endTransmission(true);
   Serial.begin(9600);
-  init_PID();
+
   pinMode(ledPin, OUTPUT);
   pinMode(motor0PWMPin, OUTPUT);
   pinMode(motor0In1Pin, OUTPUT);
   pinMode(motor0In2Pin, OUTPUT);
-  
-  digitalWrite(ledPin, HIGH);
+
   digitalWrite(motor0In1Pin, HIGH);
   digitalWrite(motor0In2Pin, LOW);
   analogWrite(motor0PWMPin, 0);
+  analogWrite(motor1PWMPin, 0);
 
 
 
+  for (int i = 0; i < 10; i++) {
+    digitalWrite(ledPin, LOW);
+    delay(250);
+    digitalWrite(ledPin, HIGH);
+    delay(250);
 
+  }
 
-  
+  init_PID();
 }
 void loop() {
   updateSensorValues();
-//  delay(250);
+  //  delay(250);
 
   Serial.println(motorPower);
   setSpeed(motorPower);
 }
 
-void setSpeed(int inputPower){
-  if(inputPower > 0){
+void setSpeed(int inputPower) {
+  if (inputPower > 0) {
     digitalWrite(motor0In1Pin, HIGH);
     digitalWrite(motor0In2Pin, LOW);
   }
-  else{
+  else {
     digitalWrite(motor0In1Pin, LOW);
     digitalWrite(motor0In2Pin, HIGH);
   }
@@ -149,10 +155,10 @@ ISR(TIMER1_COMPA_vect) {
   gyroAngle = (float)gyroRate * sampleTime;
   currentAngle = (1.0 - alpha) * (prevAngle + gyroAngle) + alpha * (accAngle);
 
-  error = currentAngle-targetAngle;
+  error = currentAngle - targetAngle;
   errorSum = errorSum + error;
   errorSum = constrain(errorSum, -300, 300);
-  motorPower = Kp * error + Ki*errorSum*sampleTime - Kd*(currentAngle-prevAngle)/sampleTime;
+  motorPower = Kp * error + Ki * errorSum * sampleTime - Kd * (currentAngle - prevAngle) / sampleTime;
   motorPower = constrain(motorPower, -255, 255);
 
   prevAngle = currentAngle;
