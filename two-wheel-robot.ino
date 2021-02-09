@@ -111,12 +111,17 @@ void setSpeed(int inputPower) {
   if (inputPower > 0) {
     digitalWrite(motor0In1Pin, HIGH);
     digitalWrite(motor0In2Pin, LOW);
+    digitalWrite(motor1In1Pin, HIGH);
+    digitalWrite(motor1In2Pin, LOW);
   }
   else {
     digitalWrite(motor0In1Pin, LOW);
     digitalWrite(motor0In2Pin, HIGH);
+    digitalWrite(motor1In1Pin, HIGH);
+    digitalWrite(motor1In2Pin, LOW);
   }
   analogWrite(motor0PWMPin, abs(motorPower));
+  analogWrite(motor1PWMPin, abs(motorPower));
 }
 
 void updateSensorValues() {
