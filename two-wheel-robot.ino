@@ -29,12 +29,12 @@ const byte motor1PWMPin = 6;
 const byte motor1In1Pin = 7;
 const byte motor1In2Pin = 9;
 
-const float Kp = 40;
-const float Kd = 0;
-const float Ki = 0;
+const float Kp = 25;
+const float Kd = 0.04;
+const float Ki = 40;
 const float alpha = 0.0066;
 const float sampleTime = 0.005; // seconds
-const float targetAngle = -3; //degrees
+const float targetAngle = 0; //degrees
 
 // MPU6050 Setup
 const int MPU_addr = 0x68; // I2C address of the MPU-6050
