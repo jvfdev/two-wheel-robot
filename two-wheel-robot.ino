@@ -38,10 +38,10 @@ const byte motor1In2Pin = 9;
 //const float Ki = 4;
 
 const float Kp = 0.6 * 58;
-const float Kd = .125 * .3;
-const float Ki = 4;
+const float Kd = 0;//.16 * .3;
+const float Ki = 15;
 const float alpha = 0.0066;
-const int maxError = 600;
+const int maxError = 1500;
 
 const float reverseCorrection = 1.1; // motors move slower in reverse direction for some reason, this corrects it.
 
@@ -139,7 +139,9 @@ void setSpeed(int inputPower) {
     digitalWrite(motor1In1Pin, LOW);
     digitalWrite(motor1In2Pin, HIGH);
     inputPower = inputPower * reverseCorrection;
+    
   }
+  inputPower = constrain(inputPower, -255, 255);
   analogWrite(motor0PWMPin, abs(inputPower));
   analogWrite(motor1PWMPin, abs(inputPower));
 }
