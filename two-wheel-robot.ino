@@ -29,12 +29,22 @@ const byte motor1PWMPin = 6;
 const byte motor1In1Pin = 7;
 const byte motor1In2Pin = 9;
 
-const float Kp = 25;
-const float Kd = 0.04;
-const float Ki = 40;
+
+//based on Ziegler-Nichols
+// Kcr ~ 50
+//// Pcd ~ 0.3 s
+//const float Kp = 0.6*50;
+//const float Kd = .125*.3;
+//const float Ki = 4;
+
+const float Kp = 0.6*63;
+const float Kd = .125*.3;
+const float Ki = 4;
 const float alpha = 0.0066;
+const int maxError = 300;
+
 const float sampleTime = 0.005; // seconds
-const float targetAngle = 0; //degrees
+const float targetAngle = -0.5; //degrees
 
 // MPU6050 Setup
 const int MPU_addr = 0x68; // I2C address of the MPU-6050
@@ -94,7 +104,7 @@ void setup() {
 
 
 
-  for (int i = 0; i < 10; i++) {
+  for (int i = 0; i < 6; i++) {
     digitalWrite(ledPin, LOW);
     delay(250);
     digitalWrite(ledPin, HIGH);
@@ -108,6 +118,7 @@ void loop() {
   updateSensorValues();
   //  delay(250);
 
+//  Serial.println(currentAngle);
 //  Serial.println(motorPower);
   setSpeed(motorPower);
 }
@@ -167,7 +178,7 @@ ISR(TIMER1_COMPA_vect) {
 
   error = currentAngle - targetAngle;
   errorSum = errorSum + error;
-  errorSum = constrain(errorSum, -300, 300);
+  errorSum = constrain(errorSum, -maxError, maxError);
   motorPower = Kp * error + Ki * errorSum * sampleTime - Kd * (currentAngle - prevAngle) / sampleTime;
   motorPower = constrain(motorPower, -255, 255);
 
