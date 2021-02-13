@@ -37,14 +37,14 @@ const byte motor1In2Pin = 9;
 //const float Kd = .125*.3;
 //const float Ki = 4;
 
-const float Kp = 0.6*63;
+const float Kp = 0.6*58;
 const float Kd = .125*.3;
 const float Ki = 4;
 const float alpha = 0.0066;
-const int maxError = 300;
+const int maxError = 600;
 
 const float sampleTime = 0.005; // seconds
-const float targetAngle = -0.5; //degrees
+const float targetAngle = 0.4; //degrees
 
 // MPU6050 Setup
 const int MPU_addr = 0x68; // I2C address of the MPU-6050
@@ -120,6 +120,7 @@ void loop() {
 
 //  Serial.println(currentAngle);
 //  Serial.println(motorPower);
+//  Serial.println(errorSum);
   setSpeed(motorPower);
 }
 
