@@ -37,11 +37,13 @@ const byte motor1In2Pin = 9;
 //const float Kd = .125*.3;
 //const float Ki = 4;
 
-const float Kp = 0.6*58;
-const float Kd = .125*.3;
+const float Kp = 0.6 * 58;
+const float Kd = .125 * .3;
 const float Ki = 4;
 const float alpha = 0.0066;
 const int maxError = 600;
+
+const float reverseCorrection = 1.1; // motors move slower in reverse direction for some reason, this corrects it.
 
 const float sampleTime = 0.005; // seconds
 const float targetAngle = 0.4; //degrees
@@ -114,13 +116,13 @@ void setup() {
 
   init_PID();
 }
+
+
 void loop() {
   updateSensorValues();
-  //  delay(250);
-
-//  Serial.println(currentAngle);
-//  Serial.println(motorPower);
-//  Serial.println(errorSum);
+  //  Serial.println(currentAngle);
+  Serial.println(motorPower);
+  //  Serial.println(errorSum);
   setSpeed(motorPower);
 }
 
@@ -136,9 +138,10 @@ void setSpeed(int inputPower) {
     digitalWrite(motor0In2Pin, HIGH);
     digitalWrite(motor1In1Pin, LOW);
     digitalWrite(motor1In2Pin, HIGH);
+    inputPower = inputPower * reverseCorrection;
   }
-  analogWrite(motor0PWMPin, abs(motorPower));
-  analogWrite(motor1PWMPin, abs(motorPower));
+  analogWrite(motor0PWMPin, abs(inputPower));
+  analogWrite(motor1PWMPin, abs(inputPower));
 }
 
 void updateSensorValues() {
