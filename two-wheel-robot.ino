@@ -31,15 +31,16 @@ const byte motor1In2Pin = 9;
 
 
 //based on Ziegler-Nichols
-// Kcr ~ 50
-//// Pcd ~ 0.3 s
-//const float Kp = 0.6*50;
-//const float Kd = .125*.3;
-//const float Ki = 4;
+// Kcr ~ 50 ; 70
+//// Pcd ~ 0.3 s ; .37
+const float Kp = 40;
+const float Kd = 0;
+const float Ki = 0;
 
-const float Kp = 0.6 * 58;
-const float Kd = 0;//.16 * .3;
-const float Ki = 15;
+//const float Kp = .6*70;
+//const float Kd = .125*.37;
+//const float Ki = 1.0/(0.5*.37);
+
 const float alpha = 0.0066;
 const int maxError = 1500;
 
@@ -68,18 +69,6 @@ volatile byte count = 0;
 
 unsigned long currTime, prevTime = 0, loopTime;
 
-
-void init_PID() {
-  // Sets up timer to run control loop at 200 Hz
-  noInterrupts(); // disable interrupts before setting registers
-  TCCR1A = 0; //sets register to zero, not yet sure why this is here.
-  TCCR1B = 0; // same as above
-  OCR1A = 9999; // sets compare match register
-  TCCR1B |= (1 << WGM12); // turns on CTC
-  TCCR1B |= (1 << CS11); // sets prescaler to 8
-  TIMSK1 |= (1 << OCIE1A); // enable the interrupt
-  interrupts();
-}
 
 void setup() {
   Wire.begin();
@@ -121,7 +110,7 @@ void setup() {
 void loop() {
   updateSensorValues();
   //  Serial.println(currentAngle);
-  Serial.println(motorPower);
+  //  Serial.println(motorPower);
   //  Serial.println(errorSum);
   setSpeed(motorPower);
 }
@@ -139,7 +128,7 @@ void setSpeed(int inputPower) {
     digitalWrite(motor1In1Pin, LOW);
     digitalWrite(motor1In2Pin, HIGH);
     inputPower = inputPower * reverseCorrection;
-    
+
   }
   inputPower = constrain(inputPower, -255, 255);
   analogWrite(motor0PWMPin, abs(inputPower));
