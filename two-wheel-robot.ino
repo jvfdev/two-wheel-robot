@@ -33,16 +33,16 @@ const byte motor1In2Pin = 9;
 //based on Ziegler-Nichols
 // Kcr ~ 50 ; 70
 //// Pcd ~ 0.3 s ; .37
-const float Kp = 40;
-const float Kd = 0;
-const float Ki = 0;
+const float Kp = 0.6*65.0;
+const float Kd = .125*0.33;
+const float Ki = 1.0/(0.5*.33);
 
 //const float Kp = .6*70;
 //const float Kd = .125*.37;
 //const float Ki = 1.0/(0.5*.37);
 
 const float alpha = 0.0066;
-const int maxError = 1500;
+const int maxError = 100;
 
 const float reverseCorrection = 1.1; // motors move slower in reverse direction for some reason, this corrects it.
 
