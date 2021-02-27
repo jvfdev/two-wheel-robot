@@ -33,18 +33,18 @@ const byte motor1In2Pin = 9;
 //based on Ziegler-Nichols
 // Kcr ~ 50 ; 70
 //// Pcd ~ 0.3 s ; .37
-const float Kp = 0.6*65.0;
-const float Kd = .125*0.33;
-const float Ki = 1.0/(0.5*.33);
+//const float Kp = 0.6*65.0;
+//const float Kd = .125*0.33;
+//const float Ki = 1.0/(0.5*.33);
 
-//const float Kp = .6*70;
-//const float Kd = .125*.37;
-//const float Ki = 1.0/(0.5*.37);
+const float Kp = 200;
+const float Kd = 0;
+const float Ki = 0; //1.0/(0.5*.37);
 
 const float alpha = 0.0066;
 const int maxError = 100;
 
-const float reverseCorrection = 1.1; // motors move slower in reverse direction for some reason, this corrects it.
+//const float reverseCorrection = 1.1; // motors move slower in reverse direction for some reason, this corrects it.
 
 const float sampleTime = 0.005; // seconds
 const float targetAngle = 0.4; //degrees
@@ -61,7 +61,7 @@ const int GyXCal = 854;
 
 volatile int16_t gyroRate, GyX;
 volatile float AcXg, AcYg, AcZg, accAngle = 0, gyroAngle = 0;
-volatile float currentAngle, prevAngle = 0, error, prevError = 0, errorSum = 0, motorPower = 0;
+volatile float currentAngle, prevAngle = 0, error, prevError = 0, errorSum = 0, motorSpeed = 0;
 
 
 volatile byte count = 0;
@@ -110,30 +110,17 @@ void setup() {
 void loop() {
   updateSensorValues();
   //  Serial.println(currentAngle);
-  //  Serial.println(motorPower);
+//    Serial.print("motor speed: ");
+//    Serial.print(motorSpeed);
+//    Serial.print(", V:");
+//    Serial.print(voltage);
+//    Serial.print(", output: ");
+//    Serial.println(output);
+//    
   //  Serial.println(errorSum);
-  setSpeed(motorPower);
+  setSpeed(motorSpeed);
 }
 
-void setSpeed(int inputPower) {
-  if (inputPower > 0) {
-    digitalWrite(motor0In1Pin, HIGH);
-    digitalWrite(motor0In2Pin, LOW);
-    digitalWrite(motor1In1Pin, HIGH);
-    digitalWrite(motor1In2Pin, LOW);
-  }
-  else {
-    digitalWrite(motor0In1Pin, LOW);
-    digitalWrite(motor0In2Pin, HIGH);
-    digitalWrite(motor1In1Pin, LOW);
-    digitalWrite(motor1In2Pin, HIGH);
-    inputPower = inputPower * reverseCorrection;
-
-  }
-  inputPower = constrain(inputPower, -255, 255);
-  analogWrite(motor0PWMPin, abs(inputPower));
-  analogWrite(motor1PWMPin, abs(inputPower));
-}
 
 void updateSensorValues() {
   Wire.beginTransmission(MPU_addr);
@@ -174,8 +161,8 @@ ISR(TIMER1_COMPA_vect) {
   error = currentAngle - targetAngle;
   errorSum = errorSum + error;
   errorSum = constrain(errorSum, -maxError, maxError);
-  motorPower = Kp * error + Ki * errorSum * sampleTime - Kd * (currentAngle - prevAngle) / sampleTime;
-  motorPower = constrain(motorPower, -255, 255);
+  motorSpeed = Kp * error + Ki * errorSum * sampleTime - Kd * (currentAngle - prevAngle) / sampleTime;
+//  motorSpeed = constrain(motorSpeed, -255, 255);
 
   prevAngle = currentAngle;
   //turns the LED on/off at 1 Hz to indicate functioning/
