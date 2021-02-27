@@ -48,7 +48,7 @@ const byte motor1In2Pin = 9;
 
 const float Kp = 0.6 * 450.0;
 const float Kd = 0.125 * 0.35;
-const float Ki = 126.0 / (0.5 * 0.35);
+const float Ki = 158.0 / (0.5 * 0.35);
 
 const float alpha = 0.0066;
 const int maxError = 3000;
