@@ -31,18 +31,26 @@ const byte motor1In2Pin = 9;
 
 
 //based on Ziegler-Nichols
-// Kcr ~ 50 ; 70
-//// Pcd ~ 0.3 s ; .37
-//const float Kp = 0.6*65.0;
-//const float Kd = .125*0.33;
-//const float Ki = 1.0/(0.5*.33);
+// Kp_cr: Lowest value of Kp (when I, D = 0), where system oscillates
+// P_cr: Period of oscillations
+//const float Kp = 0.6*Kcr;
+//const float Kd = Kcr * 0.125 * P_cr;
+//const float Ki = Kcr * 1.0/(0.5*P_cr);
 
-const float Kp = 200;
-const float Kd = 0;
-const float Ki = 0; //1.0/(0.5*.37);
+// Kp_cr = 450
+// P_cr = 0.35
+
+// Passable constants
+//const float Kp = 0.6 * 450.0;
+//const float Kd = 0.125 * 0.35;
+//const float Ki = 100.0 / (0.5 * 0.35);
+
+const float Kp = 0.6 * 450.0;
+const float Kd = 0.125 * 0.35;
+const float Ki = 100.0 / (0.5 * 0.35);
 
 const float alpha = 0.0066;
-const int maxError = 100;
+const int maxError = 3000;
 
 //const float reverseCorrection = 1.1; // motors move slower in reverse direction for some reason, this corrects it.
 
@@ -110,13 +118,13 @@ void setup() {
 void loop() {
   updateSensorValues();
   //  Serial.println(currentAngle);
-//    Serial.print("motor speed: ");
-//    Serial.print(motorSpeed);
-//    Serial.print(", V:");
-//    Serial.print(voltage);
-//    Serial.print(", output: ");
-//    Serial.println(output);
-//    
+  //    Serial.print("motor speed: ");
+  //    Serial.print(motorSpeed);
+  //    Serial.print(", V:");
+  //    Serial.print(voltage);
+  //    Serial.print(", output: ");
+  //    Serial.println(output);
+  //
   //  Serial.println(errorSum);
   setSpeed(motorSpeed);
 }
@@ -162,7 +170,7 @@ ISR(TIMER1_COMPA_vect) {
   errorSum = errorSum + error;
   errorSum = constrain(errorSum, -maxError, maxError);
   motorSpeed = Kp * error + Ki * errorSum * sampleTime - Kd * (currentAngle - prevAngle) / sampleTime;
-//  motorSpeed = constrain(motorSpeed, -255, 255);
+  //  motorSpeed = constrain(motorSpeed, -255, 255);
 
   prevAngle = currentAngle;
   //turns the LED on/off at 1 Hz to indicate functioning/
