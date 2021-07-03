@@ -55,7 +55,7 @@ const int maxError = 3000;
 
 //const float reverseCorrection = 1.1; // motors move slower in reverse direction for some reason, this corrects it.
 
-const float sampleTime = 0.005; // seconds
+const float sampleTime = 0.001; // seconds
 const float targetAngle = 0.4; //degrees
 
 // MPU6050 Setup
@@ -80,6 +80,8 @@ unsigned long currTime, prevTime = 0, loopTime;
 
 
 void setup() {
+  
+
   Wire.begin();
   Wire.beginTransmission(MPU_addr);
   Wire.write(0x6B);  // PWR_MGMT_1 register
@@ -102,6 +104,9 @@ void setup() {
   analogWrite(motor0PWMPin, 0);
   analogWrite(motor1PWMPin, 0);
 
+  DDRB |= 0b00010000;
+  PORTB |= 0b00010000; // turn on pin 12
+
 
 
   for (int i = 0; i < 6; i++) {
@@ -117,7 +122,9 @@ void setup() {
 
 
 void loop() {
+  // PORTB |= 0b00010000; // turn on pin 12
   updateSensorValues();
+  // PORTB &= 0b11101111; // turn off pin 12
   //  Serial.println(currentAngle);
   //    Serial.print("motor speed: ");
   //    Serial.print(motorSpeed);
@@ -162,6 +169,7 @@ void updateSensorValues() {
 
 ISR(TIMER1_COMPA_vect) {
   //This interrupt activated every time timer comparitor triggers
+  PORTB |= 0b00010000; // turn on pin 12
   accAngle = atan2(AcYg, AcZg) * RAD_TO_DEG;
   gyroRate = map(GyX, -32768, 32767, -250, 250);
   gyroAngle = (float)gyroRate * sampleTime;
@@ -180,4 +188,5 @@ ISR(TIMER1_COMPA_vect) {
     count = 0;
     digitalWrite(ledPin, !digitalRead(ledPin));
   }
+  PORTB &= 0b11101111; // turn off pin 12
 }
